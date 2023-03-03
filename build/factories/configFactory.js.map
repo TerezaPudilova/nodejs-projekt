@@ -1,0 +1,1 @@
+{"version":3,"file":"configFactory.js","sourceRoot":"","sources":["../../src/factories/configFactory.ts"],"names":[],"mappings":";;;AAAA,sCAAiC;AAEjC,MAAa,aAAa;IAEtB,gBAAe,CAAC;IAET,MAAM,CAAC,SAAS;QAEnB,MAAM,IAAI,GAAG,OAAO,CAAC,GAAG,CAAC,QAAQ,CAAC;QAElC,QAAQ,IAAI,EAAE;YACV;gBACI,OAAO,IAAA,eAAM,GAAE,CAAC;SACvB;IACL,CAAC;CACJ;AAbD,sCAaC"}

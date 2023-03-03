@@ -1,0 +1,1 @@
+{"version":3,"file":"location.middleware.js","sourceRoot":"","sources":["../../src/middlewares/location.middleware.ts"],"names":[],"mappings":";;;AAEA,SAAgB,kBAAkB,CAAC,OAAwB,EAAE,QAA0B,EAAE,IAAI;IAC1F,QAAQ,CAAC,GAAG,CAAC,YAAY,EAAE,OAAO,CAAC,GAAG,CAAC,QAAQ,CAAC,CAAC;IACjD,IAAI,EAAE,CAAC;AACV,CAAC;AAHD,gDAGC"}

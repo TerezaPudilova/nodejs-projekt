@@ -1,6 +1,7 @@
 import {ServerBaseBootstrap} from './serverBase.bootstrap';
 import express from 'express';
 import {logger} from '../../logger/tslogger';
+import { KeyService } from '../../services/key.service';
 
 const cluster = require('cluster');
 
@@ -9,8 +10,8 @@ const cluster = require('cluster');
  */
 export class ServerCloudBootstrap extends ServerBaseBootstrap{
 
-    constructor() {
-        super();
+    constructor(keyService: KeyService) {
+        super(keyService);
     }
 
     public async start() {

@@ -1,4 +1,5 @@
 import {ServerCloudBootstrap} from '../bootstrap/server/serverCloud.bootstrap';
+import { KeyService } from '../services/key.service';
 
 export class ServerFactory {
     /**
@@ -12,7 +13,8 @@ export class ServerFactory {
 
         switch (type) {
             default:
-                return new ServerCloudBootstrap();
+                return new ServerCloudBootstrap(new KeyService());
+               // return new ServerCloudBootstrap();
         }
     }
 }

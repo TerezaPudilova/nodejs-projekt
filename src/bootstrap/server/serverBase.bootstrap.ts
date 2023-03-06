@@ -6,14 +6,19 @@ import {IServerInstances} from "../../interfaces/IServerInstances";
 import {AuditServer} from "../../server/audit.server";
 import express from 'express';
 import {DefaultController} from "../../controllers/default.controller";
+import { KeysController } from "../../controllers/keys.controller";
+import { KeyService } from "../../services/key.service";
 
 export class ServerBaseBootstrap {
 
     protected workers: number;
     protected server: AuditServer;
 
-    constructor() {
+    constructor(
+       protected keyService: KeyService
+    ) {
         this.workers = Number.parseInt(process.env.WORKERS_NUMBER) || 1;
+        //instanciovat keyService
     }
 
     /**
@@ -34,7 +39,8 @@ export class ServerBaseBootstrap {
         const port = process.env.PORT || 8080;
 
         this.server = new AuditServer(Number.parseInt(port.toString()), [
-                new DefaultController()
+                new DefaultController(),
+                new KeysController(this.keyService)
             ]
         );
 

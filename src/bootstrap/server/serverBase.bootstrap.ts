@@ -8,6 +8,8 @@ import express from 'express';
 import {DefaultController} from "../../controllers/default.controller";
 import { KeysController } from "../../controllers/keys.controller";
 import { KeyService } from "../../services/key.service";
+import { UserService } from "../../services/user.service";
+import { AuthController } from "../../controllers/auth.controller";
 
 export class ServerBaseBootstrap {
 
@@ -15,10 +17,13 @@ export class ServerBaseBootstrap {
     protected server: AuditServer;
 
     constructor(
-       protected keyService: KeyService
+       protected keyService?: KeyService,
+       protected userService?: UserService
     ) {
         this.workers = Number.parseInt(process.env.WORKERS_NUMBER) || 1;
-        //instanciovat keyService
+        //TODO - instanciovat keyService
+        this.keyService = new KeyService()
+        this.userService = new UserService()
     }
 
     /**
@@ -40,7 +45,8 @@ export class ServerBaseBootstrap {
 
         this.server = new AuditServer(Number.parseInt(port.toString()), [
                 new DefaultController(),
-                new KeysController(this.keyService)
+                new KeysController(this.keyService, this.userService),
+                new AuthController(this.userService, this.keyService)
             ]
         );
 

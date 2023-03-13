@@ -13,8 +13,7 @@ export class ServerFactory {
 
         switch (type) {
             default:
-                return new ServerCloudBootstrap(new KeyService());
-               // return new ServerCloudBootstrap();
+               return new ServerCloudBootstrap();
         }
     }
 }

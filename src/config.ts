@@ -19,11 +19,11 @@ configuration = {
         version: '1.0.0'
     },
     localhost: {
-       // mongoDbUri: 'mongodb+srv://dbUser2:QQmrYPk7TTVR6ERK@decisiongrid-staging.o51cp.mongodb.net/Decision?retryWrites=true&w=majority&readPreference=nearest',
         mongoDbUri: 'mongodb+srv://terypudilova:6R44gARoqv6QQWEs@cluster0.htakzqg.mongodb.net/messages?retryWrites=true&w=majority&readPreference=nearest',
         mongoDatabase: 'Decision',
 
         landingPageUrl: 'https://decisionrules.io/',
+        dashboardPageUrl: 'https://localhost:4200/dashboard',
         version: '1.0.0'
     },
 }

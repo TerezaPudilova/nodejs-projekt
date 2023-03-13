@@ -10,8 +10,8 @@ const cluster = require('cluster');
  */
 export class ServerCloudBootstrap extends ServerBaseBootstrap{
 
-    constructor(keyService: KeyService) {
-        super(keyService);
+    constructor() {
+        super();
     }
 
     public async start() {

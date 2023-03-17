@@ -13,10 +13,8 @@ export class KeyService {
     this.userDataAccess = UserDataAccess.getInstance();
   }
 
-  public async getKeys(keyIds: string[]): Promise<BaseKey[]> {
-    const keys = await this.keyDataAccess.getKeys(keyIds)
-
-    console.log("Toto prijde z db", keys)
+  public async getKeys(keyIds: string[], email: string): Promise<BaseKey[]> {
+    const keys = await this.keyDataAccess.getKeys(keyIds, email)
     return keys
   }
 
@@ -32,15 +30,15 @@ export class KeyService {
     key.hash = hash;
 
     await this.userDataAccess.createUserKey(email, key.id)
-    await this.keyDataAccess.createKey(key)
+    await this.keyDataAccess.createKey(key, email)
   }
 
   public async deleteKey(key: BaseKey, email: string) {
     await this.userDataAccess.deleteUserKey(email, key.id)
-    await this.keyDataAccess.deleteKey(key)
+    await this.keyDataAccess.deleteKey(key, email)
   }
 
-  public async updateKey(key: BaseKey) {
-    await this.keyDataAccess.updateKey(key)
+  public async updateKey(key: BaseKey, email: string) {
+    await this.keyDataAccess.updateKey(key, email)
   }
 }

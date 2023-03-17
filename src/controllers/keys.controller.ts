@@ -45,8 +45,7 @@ export class KeysController implements BaseController {
     //   userKeys.push(key);
     // }
 
-    userKeys = await this.keyService.getKeys(userKeysIds)
-
+    userKeys = await this.keyService.getKeys(userKeysIds, req.email);
 
     res.status(200).json({
       message: "Keys fetched successfully.",
@@ -71,10 +70,11 @@ export class KeysController implements BaseController {
     res.status(200).send();
   };
   //res.status
-  updateKeyHandler: RequestHandler = async (req, res, next) => {
+  updateKeyHandler: RequestHandler = async (req: CustomRequest, res, next) => {
     const body = req.body;
     const data = body.data;
-    await this.keyService.updateKey(data);
+    const email = req.email
+    await this.keyService.updateKey(data, email);
     res.status(200).send();
   };
 }

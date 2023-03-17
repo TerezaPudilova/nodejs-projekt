@@ -19,12 +19,24 @@ export class UserDataAccess extends DatabaseDataAccess {
     this.db.collection("users").insertOne(newUser);
   }
 
-  //napojit redis
+
   public async findUser(email: string): Promise<User> {
-    const user: User = (await this.db
-      .collection<User>("users")
-      .findOne({ email: email })) as any as User;
-    return user;
+    let redisUser;
+    let userSetToRedis;
+    redisUser = JSON.parse(await this.redisClient.get(`User cash:${email}`));
+    //console.log("Tento uzivatel nacten z redisu", redisUser)
+    if (redisUser === null) {
+      //console.log("Uzivatel neni v redisu - je potreba vytahnout z db")
+      const user: User = (await this.db
+        .collection<User>("users")
+        .findOne({ email: email })) as any as User;
+       //console.log("Tonto user dotazen z mongodb", user) 
+      userSetToRedis = await this.redisClient.set(`User cash:${email}`, JSON.stringify(user));
+      //console.log("Uzivatel uspesne zapsan do redisu", userSetToRedis)
+      redisUser = JSON.parse(await this.redisClient.get(`User cash:${email}`))
+      return redisUser
+    }
+    return redisUser;
   }
 
   public async createUserKey(email: string, key: string) {
@@ -34,9 +46,8 @@ export class UserDataAccess extends DatabaseDataAccess {
   }
 
   public async deleteUserKey(email: string, key: string) {
-    this.db.collection("users")
-    .updateOne({email: email}, {$pull: {keys: key}})
+    this.db
+      .collection("users")
+      .updateOne({ email: email }, { $pull: { keys: key } });
   }
-
-
 }

@@ -1,3 +1,4 @@
+import { devNull } from "os";
 import { BaseKey } from "../models/base-key.model";
 import { DatabaseDataAccess } from "./database.dataAccess";
 
@@ -15,90 +16,51 @@ export class KeyDataAccess extends DatabaseDataAccess {
     return KeyDataAccess.instance;
   }
 
-  // public async getKeys(keyIds: string[]): Promise<BaseKey[]> {
-  //   let redisKeysToReturn: BaseKey[] = [];
-  //   let keysToReturn: BaseKey[] = [];
-  //   let redisKey
-
-
-  //   keyIds.forEach(async (keyId)=> 
-  //   {
-  //    redisKey = this.redisClient.get(keyId)
-  //    console.log(redisKey)
-
-  //    if (redisKey === null) {
-  //     const key = (await this.db
-  //       .collection("keys")
-  //       .findOne({ id: keyId })) as any as BaseKey; 
-  //    }
-  //   }
-
-  //   )
-
-  //   const keys = (await this.db
-  //     .collection("keys")
-  //     .find({ id: { $in: keyIds } })) as any as BaseKey[];
-
-  //   await keys.forEach((key: BaseKey) => {
-  //     keysToReturn.push(key);
-  //   });
-
-  //   console.log("Toto pole je v keysToReturn", keysToReturn);
-
-  //   return keysToReturn
-  // }
-
-  // public async getKey(keyId: string): Promise<BaseKey> {
-  //   let redisKey;
-  //   redisKey = await this.redisClient.get(keyId);
-  //   // console.log(redisKey);
-  //   if (redisKey === null) {
-  //     const key = (await this.db
-  //       .collection("keys")
-  //       .findOne({ id: keyId })) as any as BaseKey;
-  //     //  console.log("Tento key prijde z mongodb", key);
-  //     const redisKeyCreated = await this.redisClient.set(
-  //       keyId,
-  //       JSON.stringify(key)
-  //     );
-  //     //  console.log("Key z mongodb se ulozil do redisu:", redisKeyCreated)
-  //     redisKey = await this.redisClient.get(keyId);
-  //     return JSON.parse(redisKey);
-  //   }
-  //   return JSON.parse(redisKey);
-  // }
-
-//userId
-    public async getKeys(keyIds: string[]): Promise<BaseKey[]> {
+  public async getKeys(keyIds: string[], email: string): Promise<BaseKey[]> {
     let keysToReturn: BaseKey[] = [];
+    let redisKeysToReturn: BaseKey[] = [];
 
-    const keys = (await this.db
-      .collection("keys")
-      .find({ id: { $in: keyIds } })) as any as BaseKey[];
+    redisKeysToReturn = JSON.parse(
+      await this.redisClient.get(`All userKeys cash:${email}`)
+    );
+    //console.log(redisKeysToReturn);
+    if (redisKeysToReturn === null) {
+      const keys = (await this.db
+        .collection("keys")
+        .find({ id: { $in: keyIds } })) as any as BaseKey[];
 
-    await keys.forEach((key: BaseKey) => {
-      keysToReturn.push(key);
-    });
+      await keys.forEach((key: BaseKey) => {
+        keysToReturn.push(key);
+      });
+      this.redisClient.set(
+        `All userKeys cash:${email}`,
+        JSON.stringify(keysToReturn)
+      );
+      redisKeysToReturn = JSON.parse(
+        await this.redisClient.get(`All userKeys cash:${email}`)
+      );
 
-    console.log("Toto pole je v keysToReturn", keysToReturn);
+     // console.log("Toto pole je v redisKeysToReturn", redisKeysToReturn);
+    }
 
-    return keysToReturn
+    return redisKeysToReturn;
   }
 
-
-
-//smazat z redisu
-  public async createKey(key: BaseKey) {
+  public async createKey(key: BaseKey, email: string) {
+    this.redisClient.del(`All userKeys cash:${email}`);
+    this.redisClient.del(`User cash:${email}`);
     this.db.collection("keys").insertOne(key);
   }
 
-  public async deleteKey(key: BaseKey) {
-    this.redisClient.del(key.id);
+  public async deleteKey(key: BaseKey, email: string) {
+    this.redisClient.del(`All userKeys cash:${email}`);
+    this.redisClient.del(`User cash:${email}`);
     this.db.collection("keys").deleteOne({ id: key.id });
   }
 
-  public async updateKey(key: BaseKey) {
-    this.redisClient.del(key.id);
+  public async updateKey(key: BaseKey, email: string) {
+    this.redisClient.del(`All userKeys cash:${email}`);
+    this.redisClient.del(`User cash:${email}`);
     this.db.collection("keys").updateOne({ id: key.id }, { $set: key });
   }
 }

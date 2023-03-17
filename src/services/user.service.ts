@@ -26,14 +26,6 @@ export class UserService {
     return loadedUser;
   }
 
-  //   public async setUserKey(email: string, key: string) {
-  //     await this.userDataAccess.createUserKey(email, key);
-  //   }
-
-  //   public async deleteUserKey(email: string, key: string) {
-  //     await this.userDataAccess.deleteUserKey(email, key)
-  //   }
-
   public async findUser(email: string): Promise<User> {
     const user = await this.userDataAccess.findUser(email);
     return user;

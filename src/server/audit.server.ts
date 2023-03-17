@@ -11,6 +11,7 @@ import process from "process";
 const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const enforce = require("express-sslify");
+const AuthMiddleware = require("../middlewares/auth");
 
 export class AuditServer {
   public app: express.Application;
@@ -52,6 +53,9 @@ export class AuditServer {
 
     this.app.use(express.json());
     this.app.use(cors());
+
+    //authmiddleware - globalne
+    this.app.use(AuthMiddleware)
 
     this.initControllers(controllers);
     this.app.use(errorHandlerMiddleware);

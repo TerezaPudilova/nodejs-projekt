@@ -15,11 +15,11 @@ export class UserDataAccess extends DatabaseDataAccess {
     return UserDataAccess.instance;
   }
 
-  //obecnejsi nazev - createUser - na vstupu prijde model usera
   public async createUser(newUser: User) {
     this.db.collection("users").insertOne(newUser);
   }
 
+  //napojit redis
   public async findUser(email: string): Promise<User> {
     const user: User = (await this.db
       .collection<User>("users")

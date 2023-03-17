@@ -21,7 +21,6 @@ export class ServerBaseBootstrap {
        protected userService?: UserService
     ) {
         this.workers = Number.parseInt(process.env.WORKERS_NUMBER) || 1;
-        //TODO - instanciovat keyService
         this.keyService = new KeyService()
         this.userService = new UserService()
     }
@@ -46,7 +45,7 @@ export class ServerBaseBootstrap {
         this.server = new AuditServer(Number.parseInt(port.toString()), [
                 new DefaultController(),
                 new KeysController(this.keyService, this.userService),
-                new AuthController(this.userService, this.keyService)
+                new AuthController(this.userService)
             ]
         );
 

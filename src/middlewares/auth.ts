@@ -1,8 +1,11 @@
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
-const { OAuth2Client } = require("google-auth-library");
+
 import path from "path";
-import { logger } from "../logger/tslogger";
+//import {jwt} from "jsonwebtoken"
+
+
+
 
 module.exports = async (req, res, next) => {
   const cert = fs.readFileSync(
@@ -10,8 +13,10 @@ module.exports = async (req, res, next) => {
     "utf8"
   );
   const authHeader = req.get("Authorization");
+ // console.log(authHeader);
   const token = authHeader.split(" ")[2];
- // logger.info(token);
+
+  //logger.info(token);
   //logger.info(cert);
 
   // app.getAuth()
@@ -45,7 +50,7 @@ module.exports = async (req, res, next) => {
     //TODO: validace expiration date
     req.userId = userId;
     req.email = email;
-    console.log("Tento email je v decoded tokenu", email)
+    //console.log("Tento email je v decoded tokenu", email);
     // console.log(userId)
   } catch (error) {
     error.status = 500;

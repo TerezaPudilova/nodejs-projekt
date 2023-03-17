@@ -1,14 +1,11 @@
 import { BaseController } from "./base.controller";
 import * as express from "express";
 import { RequestHandler } from "express";
-import { logger } from "../logger/tslogger";
 import { ConfigFactory } from "../factories/configFactory";
 import { KeyService } from "../services/key.service";
 import { UserService } from "../services/user.service";
 import { CustomRequest } from "../interfaces/CustomRequest";
 import { BaseKey } from "../models/base-key.model";
-
-const AuthMiddleware = require("../middlewares/auth");
 
 export class KeysController implements BaseController {
   public router = express.Router();
@@ -24,10 +21,10 @@ export class KeysController implements BaseController {
   }
 
   initRouter() {
-    this.router.get("/keys", AuthMiddleware, this.keysHandler);
-    this.router.post("/key", AuthMiddleware, this.createKeyHandler);
-    this.router.delete("/delete-key", AuthMiddleware, this.deleteKeyHandler);
-    this.router.put("/update-key", AuthMiddleware, this.updateKeyHandler);
+    this.router.get("/keys", this.keysHandler);
+    this.router.post("/create-key", this.createKeyHandler);
+    this.router.delete("/delete-key", this.deleteKeyHandler);
+    this.router.put("/update-key", this.updateKeyHandler);
   }
 
   keysHandler: RequestHandler = async (req: CustomRequest, res, next) => {
@@ -35,51 +32,49 @@ export class KeysController implements BaseController {
     let userKeys: BaseKey[] = [];
 
     const query = req.query;
-    const keyId = query.keyId;
- 
     const user = await this.userService.findUser(req.email);
-   
 
     if (user) {
       user.keys.forEach((key) => {
         userKeysIds.push(key);
       });
     }
-    for (const keyId of userKeysIds) {
-      const key = await this.keyService.getKey(keyId)
-      userKeys.push(key)
-    }
-   // console.log(userKeys)
+    //TODO: toto by tam nemelo byt!
+    // for (const keyId of userKeysIds) {
+    //   const key = await this.keyService.getKey(keyId);
+    //   userKeys.push(key);
+    // }
+
+    userKeys = await this.keyService.getKeys(userKeysIds)
+
+
     res.status(200).json({
       message: "Keys fetched successfully.",
-      keys: userKeys
-    })
+      keys: userKeys,
+    });
   };
 
+  //res.status
   createKeyHandler: RequestHandler = async (req, res, next) => {
     const body = req.body;
     const data = body.data;
-    await this.keyService.createKey(data);
+    const email = body.email;
+    await this.keyService.createKey(data, email);
+    res.status(200).send();
   };
-
+  //res.status
   deleteKeyHandler: RequestHandler = async (req, res, next) => {
     const body = req.body;
     const data = body.data;
-    //console.log(body)
-    await this.keyService.deleteKey(data);
-    res.status(200).json({
-      message: "Key deleted successfully",
-      key: data
-    })
-  }
-
+    const email = body.email;
+    await this.keyService.deleteKey(data, email);
+    res.status(200).send();
+  };
+  //res.status
   updateKeyHandler: RequestHandler = async (req, res, next) => {
     const body = req.body;
     const data = body.data;
-    await this.keyService.updateKey(data)
-    res.status(200).json({
-      message: "Key updated successfully",
-      key: data
-    })
-  }
+    await this.keyService.updateKey(data);
+    res.status(200).send();
+  };
 }

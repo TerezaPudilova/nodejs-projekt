@@ -11,9 +11,10 @@ const tslogger_1 = require("../logger/tslogger");
 const location_middleware_1 = require("../middlewares/location.middleware");
 const server_middleware_1 = require("../middlewares/server.middleware");
 const process_1 = __importDefault(require("process"));
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const helmet = require("helmet");
-const enforce = require('express-sslify');
+const enforce = require("express-sslify");
+const AuthMiddleware = require("../middlewares/auth");
 class AuditServer {
     constructor(port, controllers) {
         this.app = (0, express_1.default)();
@@ -25,9 +26,21 @@ class AuditServer {
         }
         this.port = port;
         this.app.use(bodyParser.json({ limit: "100mb" }));
-        this.app.use(bodyParser.urlencoded({ limit: "100mb", extended: true, parameterLimit: 50000 }));
+        this.app.use(bodyParser.urlencoded({
+            limit: "100mb",
+            extended: true,
+            parameterLimit: 50000,
+        }));
+        this.app.use((req, res, next) => {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, PATCH, DELETE");
+            res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            next();
+        });
         this.app.use(express_1.default.json());
         this.app.use((0, cors_1.default)());
+        //authmiddleware - globalne
+        //this.app.use(AuthMiddleware)
         this.initControllers(controllers);
         this.app.use(errorHandler_middleware_1.errorHandlerMiddleware);
         this.showLocation();
@@ -35,7 +48,7 @@ class AuditServer {
     showLocation() {
         const location = process_1.default.env.LOCATION;
         if (location) {
-            tslogger_1.logger.info('Location: ', location);
+            tslogger_1.logger.info("Location: ", location);
         }
     }
     listen() {
@@ -44,7 +57,7 @@ class AuditServer {
         });
     }
     initControllers(controllers) {
-        controllers.forEach(controller => {
+        controllers.forEach((controller) => {
             this.app.use(controller.path, controller.router);
         });
     }

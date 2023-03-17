@@ -3,54 +3,86 @@ import * as express from "express";
 import { RequestHandler } from "express";
 import { ConfigFactory } from "../factories/configFactory";
 import { UserService } from "../services/user.service";
-import { logger } from "../logger/tslogger";
-import { v4 as uuidv4 } from "uuid";
-import { emit } from "process";
 import { CustomRequest } from "../interfaces/CustomRequest";
-import { BaseKey } from "../models/base-key.model";
-import { KeyService } from "../services/key.service";
+import { validationResult } from "express-validator";
+import { body } from "express-validator/check";
 
-const jwt = require("jsonwebtoken");
-const AuthMiddleware = require("../middlewares/auth");
 export class AuthController implements BaseController {
   public router = express.Router();
   path = "/";
 
   private readonly config = ConfigFactory.getConfig();
 
-  constructor(
-    private userService: UserService,
-    private keyService: KeyService
-  ) {
+  constructor(private userService: UserService) {
     this.initRouter();
   }
 
   initRouter() {
-    this.router.post("/signup", this.signupHandler);
+    this.router.post(
+      "/signup",
+      [
+        body("email")
+          .isEmail()
+          .withMessage("Email must be in form name@example.com.")
+          .custom(async (value, { req }) => {
+            await this.userService.findUser(value).then((user) => {
+              if (user) {
+                return Promise.reject("E-mail address already exists");
+              }
+            });
+          })
+          .normalizeEmail(),
+        body("password")
+          .trim()
+          .isLength({ min: 6 })
+          .withMessage("Password must have at least 6 characters."),
+        body("confirmPassword")
+          .trim()
+          .custom((value, { req }) => {
+            if (value !== req.body.password) {
+              throw new Error("Password confirmation does not match password");
+            }
+            return true;
+          }),
+      ],
+      this.signupHandler
+    );
     this.router.post("/login", this.loginHandler);
-    this.router.get("/user", AuthMiddleware, this.findUserHandler);
-    this.router.put("/create-user-key", this.createUserKeyHandler);
-    this.router.put("/delete-user-key", this.deleteUserKeyHandler);
+    this.router.get("/user", this.findUserHandler);
   }
 
   signupHandler: RequestHandler = async (req, res, next) => {
+    const errors = validationResult(req);
     const body = req.body;
     const id = body.id;
     const email = body.email;
-    const keys: [] = [];
     const password = body.password;
-    // logger.info(body);
-    const user = await this.userService.signup(id, email, keys, password);
-    res.status(200).json({
-      message: "User created successfully",
-      user: {
-        id: id,
-        email: email,
-        keys: keys,
-        password: password,
-      },
-    });
-    //TODO: dodelat handlovani erroru
+    console.log(errors);
+
+    if (!errors.isEmpty()) {
+      const error = new Error("Validation failed.");
+      error.stack = errors.array().toString();
+      res.status(500).json({
+        message: "User signup was not succesfull",
+        error: errors.array(),
+      });
+      throw error;
+    }
+    try {
+      await this.userService.signup(id, email, password);
+      res.status(200).json({
+        message: "User created successfully",
+        user: {
+          id: id,
+          email: email,
+        },
+      });
+    } catch (err) {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
   };
 
   loginHandler: RequestHandler = async (req, res, next) => {
@@ -58,58 +90,48 @@ export class AuthController implements BaseController {
     const email = body.email;
     const password = body.password;
     const loadedUser = await this.userService.login(email, password);
-    
-    // logger.info(body);
-    res.status(200).json({
-      message: "User logged in successfully",
-      user: {
-        email: email,
-        keys: loadedUser.keys,
-      },
-    });
-  };
-
-  createUserKeyHandler: RequestHandler = async (req, res, next) => {
-    const body = req.body;
-    const email = body.email;
-    const key = body.key;
-    // logger.info(key);
-    // logger.info(email);
-    await this.userService.setUserKey(email, key);
-    res.status(200).json({
-      message: "User key created successfully",
-      user: {
-        email: email,
-        key: key,
-      },
-    });
-  };
-
-  deleteUserKeyHandler: RequestHandler = async (req, res, next) => {
-    const body = req.body;
-    const email = body.email;
-    const key = body.key;
-    // logger.info(key);
-    // logger.info(email);
-    await this.userService.deleteUserKey(email, key);
-    res.status(200).json({
-      message: "User key deleted successfully",
-      user: {
-        email: email,
-        key: key,
-      },
-    });
+    try {
+      //Validace emailu
+      const loadedEmail = await this.userService.findUser(email);
+      if (!loadedEmail) {
+        const error = new Error("Wrong email! Please try again.");
+        throw error;
+      }
+      //Validace hesla
+      if (password !== loadedUser.password) {
+        const error = new Error("Wrong password! Please try again.");
+        throw error;
+      }
+      res.status(200).json({
+        message: "User logged in successfully",
+        user: {
+          email: email,
+          keys: loadedUser.keys,
+        },
+      });
+    } catch (err) {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
   };
 
   findUserHandler: RequestHandler = async (req: CustomRequest, res, next) => {
     const loadedUser = await this.userService.findUser(req.email);
-
-    res.status(200).json({
-      message: "User updated successfully",
-      user: {
-        email: req.email,
-        keys: loadedUser.keys,
-      },
-    });
+    try {
+      res.status(200).json({
+        message: "User updated successfully",
+        user: {
+          email: req.email,
+          keys: loadedUser.keys,
+        },
+      });
+    } catch (err) {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
   };
 }

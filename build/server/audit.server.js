@@ -39,8 +39,7 @@ class AuditServer {
         });
         this.app.use(express_1.default.json());
         this.app.use((0, cors_1.default)());
-        //authmiddleware - globalne
-        //this.app.use(AuthMiddleware)
+        this.app.use(AuthMiddleware);
         this.initControllers(controllers);
         this.app.use(errorHandler_middleware_1.errorHandlerMiddleware);
         this.showLocation();

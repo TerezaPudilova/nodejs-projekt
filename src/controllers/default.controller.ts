@@ -21,7 +21,7 @@ export class DefaultController implements BaseController {
     }
 
     indexHandler: RequestHandler = async (req, res) => {
-        res.redirect(this.config.landingPageUrl);
+        res.redirect(this.config.dashboardPageUrl);
     };
 
     getHealthCheck: RequestHandler = async (req, res) => {

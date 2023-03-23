@@ -33,7 +33,7 @@ class DefaultController {
         this.path = '/';
         this.config = configFactory_1.ConfigFactory.getConfig();
         this.indexHandler = async (req, res) => {
-            res.redirect(this.config.landingPageUrl);
+            res.redirect(this.config.dashboardPageUrl);
         };
         this.getHealthCheck = async (req, res) => {
             if (DBConnections_1.DBConnections.isConnected === false) {

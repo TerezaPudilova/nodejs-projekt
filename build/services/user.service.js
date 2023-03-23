@@ -19,12 +19,6 @@ class UserService {
         const loadedUser = await this.userDataAccess.findUser(email);
         return loadedUser;
     }
-    //   public async setUserKey(email: string, key: string) {
-    //     await this.userDataAccess.createUserKey(email, key);
-    //   }
-    //   public async deleteUserKey(email: string, key: string) {
-    //     await this.userDataAccess.deleteUserKey(email, key)
-    //   }
     async findUser(email) {
         const user = await this.userDataAccess.findUser(email);
         return user;

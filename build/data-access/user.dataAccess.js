@@ -12,15 +12,22 @@ class UserDataAccess extends database_dataAccess_1.DatabaseDataAccess {
         }
         return UserDataAccess.instance;
     }
-    //obecnejsi nazev - createUser - na vstupu prijde model usera
     async createUser(newUser) {
         this.db.collection("users").insertOne(newUser);
     }
     async findUser(email) {
-        const user = (await this.db
-            .collection("users")
-            .findOne({ email: email }));
-        return user;
+        let redisUser;
+        let userSetToRedis;
+        redisUser = JSON.parse(await this.redisClient.get(`User cash:${email}`));
+        if (redisUser === null) {
+            const user = (await this.db
+                .collection("users")
+                .findOne({ email: email }));
+            userSetToRedis = await this.redisClient.set(`User cash:${email}`, JSON.stringify(user));
+            redisUser = JSON.parse(await this.redisClient.get(`User cash:${email}`));
+            return redisUser;
+        }
+        return redisUser;
     }
     async createUserKey(email, key) {
         this.db
@@ -28,7 +35,8 @@ class UserDataAccess extends database_dataAccess_1.DatabaseDataAccess {
             .updateOne({ email: email }, { $addToSet: { keys: key } });
     }
     async deleteUserKey(email, key) {
-        this.db.collection("users")
+        this.db
+            .collection("users")
             .updateOne({ email: email }, { $pull: { keys: key } });
     }
 }

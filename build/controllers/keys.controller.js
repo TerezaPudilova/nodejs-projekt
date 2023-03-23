@@ -26,7 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.KeysController = void 0;
 const express = __importStar(require("express"));
 const configFactory_1 = require("../factories/configFactory");
-const AuthMiddleware = require("../middlewares/auth");
 class KeysController {
     constructor(keyService, userService) {
         this.keyService = keyService;
@@ -38,68 +37,76 @@ class KeysController {
             let userKeysIds = [];
             let userKeys = [];
             const query = req.query;
-            //const keyId = query.keyId;
             const user = await this.userService.findUser(req.email);
             if (user) {
                 user.keys.forEach((key) => {
                     userKeysIds.push(key);
                 });
             }
-            for (const keyId of userKeysIds) {
-                const key = await this.keyService.getKey(keyId);
-                userKeys.push(key);
-            }
-            // console.log(userKeys)
+            userKeys = await this.keyService.getKeys(userKeysIds, req.email);
             res.status(200).json({
                 message: "Keys fetched successfully.",
-                keys: userKeys
+                keys: userKeys,
             });
         };
+        //res.status
         this.createKeyHandler = async (req, res, next) => {
             const body = req.body;
             const data = body.data;
             const email = body.email;
-            //(body);
-            await this.keyService.createKey(data, email);
-            // await this.userService.setUserKey(email, keyId);
-            res.status(200).json({
-                message: "User key created successfully",
-                user: {
-                    email: email,
-                    key: data,
-                },
-            });
+            try {
+                await this.keyService.createKey(data, email);
+                res.status(200).send();
+            }
+            catch (err) {
+                if (!err.statusCode) {
+                    err.statusCode = 400;
+                    err.message = "Creating key was not possible";
+                }
+                next(err);
+            }
         };
+        //res.status
         this.deleteKeyHandler = async (req, res, next) => {
             const body = req.body;
             const data = body.data;
-            // const key = body.key
             const email = body.email;
-            //console.log(body);
-            await this.keyService.deleteKey(data, email);
-            // await this.userService.deleteUserKey(email, key);
-            res.status(200).json({
-                message: "Key deleted successfully",
-                key: data
-            });
+            try {
+                await this.keyService.deleteKey(data, email);
+                res.status(200).send();
+            }
+            catch (err) {
+                if (!err.statusCode) {
+                    err.statusCode = 400;
+                    err.message = "Deleting key was not possible";
+                }
+                next(err);
+            }
         };
+        //res.status
         this.updateKeyHandler = async (req, res, next) => {
             const body = req.body;
             const data = body.data;
-            await this.keyService.updateKey(data);
-            res.status(200).json({
-                message: "Key updated successfully",
-                key: data
-            });
+            const email = req.email;
+            try {
+                await this.keyService.updateKey(data, email);
+                res.status(200).send();
+            }
+            catch (err) {
+                if (!err.statusCode) {
+                    err.statusCode = 400;
+                    err.message = "Updating key was not possible";
+                }
+                next(err);
+            }
         };
         this.initRouter();
     }
-    //presunout do audit.server.ts
     initRouter() {
-        this.router.get("/keys", AuthMiddleware, this.keysHandler);
-        this.router.post("/create-key", AuthMiddleware, this.createKeyHandler);
-        this.router.delete("/delete-key", AuthMiddleware, this.deleteKeyHandler);
-        this.router.put("/update-key", AuthMiddleware, this.updateKeyHandler);
+        this.router.get("/keys", this.keysHandler);
+        this.router.post("/create-key", this.createKeyHandler);
+        this.router.delete("/delete-key", this.deleteKeyHandler);
+        this.router.put("/update-key", this.updateKeyHandler);
     }
 }
 exports.KeysController = KeysController;

@@ -5,13 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
-const { OAuth2Client } = require("google-auth-library");
 const path_1 = __importDefault(require("path"));
+//import {jwt} from "jsonwebtoken"
 module.exports = async (req, res, next) => {
     const cert = fs.readFileSync(path_1.default.resolve(__dirname, "../assets/public.pem"), "utf8");
     const authHeader = req.get("Authorization");
+    // console.log(authHeader);
     const token = authHeader.split(" ")[2];
-    // logger.info(token);
+    //logger.info(token);
     //logger.info(cert);
     // app.getAuth()
     // .verifyIdToken(token)
@@ -40,7 +41,7 @@ module.exports = async (req, res, next) => {
         //TODO: validace expiration date
         req.userId = userId;
         req.email = email;
-        console.log("Tento email je v decoded tokenu", email);
+        //console.log("Tento email je v decoded tokenu", email);
         // console.log(userId)
     }
     catch (error) {

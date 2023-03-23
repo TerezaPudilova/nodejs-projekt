@@ -54,7 +54,6 @@ export class AuditServer {
     this.app.use(express.json());
     this.app.use(cors());
 
-    //authmiddleware - globalne
     this.app.use(AuthMiddleware)
 
     this.initControllers(controllers);

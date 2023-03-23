@@ -6,6 +6,7 @@ import { UserService } from "../services/user.service";
 import { CustomRequest } from "../interfaces/CustomRequest";
 import { validationResult } from "express-validator";
 import { body } from "express-validator/check";
+const bcrypt = require("bcryptjs");
 
 export class AuthController implements BaseController {
   public router = express.Router();
@@ -63,13 +64,14 @@ export class AuthController implements BaseController {
       const error = new Error("Validation failed.");
       error.stack = errors.array().toString();
       res.status(500).json({
-        message: "User signup was not succesfull",
+        message: "User signup was not successfull",
         error: errors.array(),
       });
       throw error;
     }
     try {
-      await this.userService.signup(id, email, password);
+      const hashedPassword = await bcrypt.hash(password, 12);
+      await this.userService.signup(id, email, hashedPassword);
       res.status(200).json({
         message: "User created successfully",
         user: {
@@ -98,7 +100,8 @@ export class AuthController implements BaseController {
         throw error;
       }
       //Validace hesla
-      if (password !== loadedUser.password) {
+      const isEqual = await bcrypt.compare(password, loadedUser.password)
+        if (!isEqual) {
         const error = new Error("Wrong password! Please try again.");
         throw error;
       }
@@ -121,7 +124,7 @@ export class AuthController implements BaseController {
     const loadedUser = await this.userService.findUser(req.email);
     try {
       res.status(200).json({
-        message: "User updated successfully",
+        message: "User found successfully",
         user: {
           email: req.email,
           keys: loadedUser.keys,

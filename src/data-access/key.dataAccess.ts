@@ -39,8 +39,6 @@ export class KeyDataAccess extends DatabaseDataAccess {
       redisKeysToReturn = JSON.parse(
         await this.redisClient.get(`All userKeys cash:${email}`)
       );
-
-     // console.log("Toto pole je v redisKeysToReturn", redisKeysToReturn);
     }
 
     return redisKeysToReturn;

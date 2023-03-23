@@ -14,7 +14,7 @@ configuration = {
     prod: {
         mongoDbUri: 'mongodb+srv://DecisionUser248:advREX2kXa4JaBQD@decisioncluster.fcpws.mongodb.net/Decision?retryWrites=true&w=majority&readPreference=nearest',
         mongoDatabase: 'Decision',
-        redisPassword: 'F-xfJytH6BF6Tn9',
+        redisPassword: '1r7JzJUPefZhIiNy0Ty50SAV3uUK71mV',
         redisPort: 11833,
         redisHost: 'redis-11833.c250.eu-central-1-1.ec2.cloud.redislabs.com',
 
@@ -24,7 +24,7 @@ configuration = {
     localhost: {
         mongoDbUri: 'mongodb+srv://terypudilova:6R44gARoqv6QQWEs@cluster0.htakzqg.mongodb.net/messages?retryWrites=true&w=majority&readPreference=nearest',
         mongoDatabase: 'Decision',
-        redisPassword: 'F-xfJytH6BF6Tn9',
+        redisPassword: '1r7JzJUPefZhIiNy0Ty50SAV3uUK71mV',
         redisPort: 11833,
         redisHost: 'redis-11833.c250.eu-central-1-1.ec2.cloud.redislabs.com',
 

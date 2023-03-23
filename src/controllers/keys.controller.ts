@@ -39,11 +39,6 @@ export class KeysController implements BaseController {
         userKeysIds.push(key);
       });
     }
-    //TODO: toto by tam nemelo byt!
-    // for (const keyId of userKeysIds) {
-    //   const key = await this.keyService.getKey(keyId);
-    //   userKeys.push(key);
-    // }
 
     userKeys = await this.keyService.getKeys(userKeysIds, req.email);
 
@@ -58,23 +53,49 @@ export class KeysController implements BaseController {
     const body = req.body;
     const data = body.data;
     const email = body.email;
-    await this.keyService.createKey(data, email);
-    res.status(200).send();
+    try {
+      await this.keyService.createKey(data, email);
+      res.status(200).send();
+    } catch (err) {
+      if (!err.statusCode) {
+        err.statusCode = 400
+        err.message = "Creating key was not possible"
+      } 
+      next(err)
+    }
+
   };
   //res.status
   deleteKeyHandler: RequestHandler = async (req, res, next) => {
     const body = req.body;
     const data = body.data;
     const email = body.email;
-    await this.keyService.deleteKey(data, email);
-    res.status(200).send();
+    try {
+      await this.keyService.deleteKey(data, email);
+      res.status(200).send();
+    } catch (err) {
+      if (!err.statusCode) {
+        err.statusCode = 400
+        err.message = "Deleting key was not possible"
+      }
+      next(err)
+    }
+
   };
   //res.status
   updateKeyHandler: RequestHandler = async (req: CustomRequest, res, next) => {
     const body = req.body;
     const data = body.data;
     const email = req.email
-    await this.keyService.updateKey(data, email);
-    res.status(200).send();
+    try {
+      await this.keyService.updateKey(data, email);
+      res.status(200).send();
+    } catch (err) {
+      if (!err.statusCode) {
+        err.statusCode = 400;
+        err.message = "Updating key was not possible"
+      }
+      next(err)
+    }
   };
 }

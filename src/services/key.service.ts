@@ -2,8 +2,9 @@ import { KeyDataAccess } from "../data-access/key.dataAccess";
 import { BaseKey } from "../models/base-key.model";
 import { v4 as uuidv4 } from "uuid";
 import { UserDataAccess } from "../data-access/user.dataAccess";
+import { KeyServiceInterface } from "../interfaces/KeyService";
 
-export class KeyService {
+export class KeyService implements KeyServiceInterface {
 
   keyDataAccess: KeyDataAccess;
   userDataAccess: UserDataAccess;

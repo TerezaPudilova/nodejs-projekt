@@ -30,10 +30,10 @@ export class DBConnections {
 
     //hodit do samostatne tridy - oddelit mongo a redis
     this.redisClient = createClient({
-      password: "1r7JzJUPefZhIiNy0Ty50SAV3uUK71mV",
+      password: this.config.redisPassword,
       socket: {
-        port: 11833,
-        host: "redis-11833.c250.eu-central-1-1.ec2.cloud.redislabs.com",
+        port: this.config.redisPort,
+        host: this.config.redisHost,
       },
     });
 

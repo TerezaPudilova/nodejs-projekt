@@ -1,10 +1,11 @@
 import { UserDataAccess } from "../data-access/user.dataAccess";
+import { UserServiceInterface } from "../interfaces/UserService";
 //const { validationResult } = require("express-validator/check");
 //import { bcrypt } from "../../node_modules/bcrypt";
 const bcrypt = require("bcrypt");
 import { User } from "../models/user";
 
-export class UserService {
+export class UserService implements UserServiceInterface {
   userDataAccess: UserDataAccess;
 
   constructor() {

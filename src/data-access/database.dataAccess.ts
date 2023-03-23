@@ -17,10 +17,6 @@ export class DatabaseDataAccess {
     this.client = await dbConnection.getMongoClient();
     this.db = this.client.db(ConfigFactory.getConfig().mongoDatabase);
     this.redisClient = dbConnection.redisClient;
-    //console.log(this.redisClient)
-    // this.redisClient.ping("message").then((mess) => {
-    //     console.log(mess);
-    //   });
     const redisIsReady = this.redisClient.isReady;
     const redisIsOpen = this.redisClient.isOpen;
     console.log("Je redis ready? - ", redisIsReady);

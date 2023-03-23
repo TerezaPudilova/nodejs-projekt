@@ -1,5 +1,5 @@
 {
-  "name": "dr-audit",
+  "name": "nodejs-project-audit",
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",

@@ -1,14 +1,13 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
-const path_1 = __importDefault(require("path"));
 //import {jwt} from "jsonwebtoken"
 module.exports = async (req, res, next) => {
-    const cert = fs.readFileSync(path_1.default.resolve(__dirname, "../assets/public.pem"), "utf8");
+    // const cert = fs.readFileSync(
+    //   path.resolve(__dirname, "../assets/public.pem"),
+    //   "utf8"
+    // );
     const authHeader = req.get("Authorization");
     // console.log(authHeader);
     const token = authHeader.split(" ")[2];
